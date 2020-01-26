@@ -2,6 +2,7 @@ const User = require('../models/UserModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
+const mailer = require('../modules/mailer')
 
 const authConfig = require('../config/auth')
 
@@ -81,22 +82,25 @@ exports.forgotPassword = async (req, res) => {
       }
     });
     
-    const mail = {
-      from: 'imerno@gmail.com',
+    // const mail = {
+    //   from: 'imerno@gmail.com',
+    //   to: email,
+    //   subject: "Forgot Password",
+    //   context: { token },
+    // }
+    mailer.sendMail({
       to: email,
-      subject: "Forgot Password",
+      from: 'imerno@gmail.com',
+      template: 'auth/forgot_password',
       context: { token },
-    }
-    mailer.sendMail(mail, (err) => {
+      }, (err) => {
       if(err)
         return res.status(400).send({error: "Cannot possible to send email to reset your passwor!"});
-      console.log(mail);
-      
+   
       return res.send();
     });
   } catch (err) {
-    console.log(err);
-    
+    console.log(err);    
     return res.status(400).send({error: "Error on forgot password, try again"});
   }
 }

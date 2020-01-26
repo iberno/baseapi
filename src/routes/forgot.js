@@ -1,7 +1,7 @@
 const express = require('express')
 
 const {
-  authLogin,
+  forgotPassword
 } = require('../controllers/AuthController');
 
 const router = express.Router();
@@ -9,6 +9,6 @@ const router = express.Router();
 // Unauthenticated Routes
 router
   .route('/')
-  .post(authLogin)
+  .post(forgotPassword)
 
 module.exports = router;
