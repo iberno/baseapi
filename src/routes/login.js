@@ -1,7 +1,7 @@
 const express = require('express')
 
 const {
-  authLogin
+  authLogin,
 } = require('../controllers/authController');
 
 const router = express.Router();

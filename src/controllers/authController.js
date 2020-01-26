@@ -1,6 +1,7 @@
 const User = require('../models/UserModel');
 const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken')
+const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const authConfig = require('../config/auth')
 
@@ -60,21 +61,43 @@ exports.authLogin = async (req, res) => {
   });
 }
 
+exports.forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email })
 
+    if(!user)
+      return res.status(400).send({error: "User Not Found!"});
 
+    const token = crypto.randomBytes(20).toString('hex');
 
+    const now = new Date();
+    now.setHours(now.getHours() + 1);
 
-
-
-
-
-
-
-
-
-
-
-
-
-
+    await User.findByIdAndUpdate(user.id, {
+      '$set': {
+        passwordResetToken: token,
+        passwordResetExpires: now,
+      }
+    });
+    
+    const mail = {
+      from: 'imerno@gmail.com',
+      to: email,
+      subject: "Forgot Password",
+      context: { token },
+    }
+    mailer.sendMail(mail, (err) => {
+      if(err)
+        return res.status(400).send({error: "Cannot possible to send email to reset your passwor!"});
+      console.log(mail);
+      
+      return res.send();
+    });
+  } catch (err) {
+    console.log(err);
+    
+    return res.status(400).send({error: "Error on forgot password, try again"});
+  }
+}
 
